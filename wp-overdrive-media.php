@@ -361,11 +361,11 @@ class WPO_Media {
 WPO_Media::instance();
 
 // GitHub Plugin Updates
-if( ! class_exists( 'WPO_Update' ) ){
+if( ! class_exists( '\WPOverdrive\Core\WPO_Update' ) ){
 	include_once( plugin_dir_path( __FILE__ ) . 'wpo_update.php' );
 }
 
-$update = new WPO_Update( __FILE__ );
+$update = new \WPOverdrive\Core\WPO_Update( __FILE__ );
 $update->set_username( 'edmistons' );
 $update->set_repository( 'wp-overdrive-media' );
 $update->authorize( 'b32b2617ffb37d4d937660f9a6b4a10abf306acd' ); // Your auth code goes here for private repos

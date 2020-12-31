@@ -1,4 +1,5 @@
 <?php
+namespace WPOverdrive\Core;
 
 class WPO_Update {
 	private $file;
