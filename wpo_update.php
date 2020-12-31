@@ -53,13 +53,20 @@ class WPO_Update {
 							CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 							CURLOPT_CUSTOMREQUEST => "GET",
 							CURLOPT_HTTPHEADER => [
-									"Authorization: token " . $this->authorize_token,
-									"User-Agent: PDUpdater/1.2.3"
+									"User-Agent: WP-Overdrive"
 							]
+
 					]);
 
-					$response = curl_exec($curl);
+					if ($this->authorize_token) {
+						curl_setopt_array($curl, [
+							CURLOPT_HTTPHEADER => [
+									"Authorization: token " . $this->authorize_token
+							]
+						]);
+					}
 
+					$response = curl_exec($curl);
 					curl_close($curl);
 
 					$response = json_decode($response, true);
@@ -68,15 +75,13 @@ class WPO_Update {
 							$response = current($response);
 					}
 
-					// if ($this->authorize_token) {
-					// 		$response['zipball_url'] = add_query_arg('access_token', $this->authorize_token, $response['zipball_url']);
-					// }
 
 					$this->github_response = $response;
 			}
 	}
 
 	public function initialize() {
+			$this->get_repository_info();
 			add_filter('pre_set_site_transient_update_plugins', [$this, 'modify_transient'], 10, 1);
 			add_filter('plugins_api', [$this, 'plugin_popup'], 10, 3);
 			add_filter('upgrader_post_install', [$this, 'after_install'], 10, 3);
