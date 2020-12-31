@@ -5,7 +5,7 @@
  * Plugin URI: https://wp-overdrive.com
  * Author: Edmiston[R+D]
  * Author URI: https://edmistons.com
- * Version: 1.0.2
+ * Version: 1.0.3
  **/
 
 namespace WPOverdrive\Modules;
@@ -35,6 +35,9 @@ class WPO_Media {
   }
 
   function register_settings(){
+    // License Key
+
+    // Upload Directory Template
   	register_setting('media', 'wpo_media',[$this, 'sanitize_settings']);
     add_settings_field( 'upload_dir',
       'Upload Template',
@@ -361,13 +364,15 @@ class WPO_Media {
 WPO_Media::instance();
 
 // GitHub Plugin Updates
-if( ! class_exists( '\WPOverdrive\Core\WPO_Update' ) ){
-	include_once( plugin_dir_path( __FILE__ ) . 'wpo_update.php' );
-  
-  $update = new \WPOverdrive\Core\WPO_Update( __FILE__ );
-  $update->set_username( 'edmistons' );
-  $update->set_repository( 'wp-overdrive-media' );
-  // $update->authorize( '' ); // Your auth code goes here for private repos
+include_once( plugin_dir_path( __FILE__ ) . 'wpo_update.php' );
 
-  $update->initialize();
+$update = new \WPOverdrive\Core\WPO_Update( __FILE__ );
+$update->set_username( 'edmistons' );
+$update->set_repository( 'wp-overdrive-media' );
+
+if ((string) get_option('wpo_media_license_key') !== '') {
+  $update->authorize(get_option('wpo_media_license_key'));
+  $update->set_repository( 'wp-overdrive-media-pro' );
 }
+
+$update->initialize();
