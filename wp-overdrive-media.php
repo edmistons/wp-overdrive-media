@@ -5,7 +5,7 @@
  * Plugin URI: https://wp-overdrive.com
  * Author: Edmiston[R+D]
  * Author URI: https://edmistons.com
- * Version: 1.0.0
+ * Version: 1.0.1
  **/
 
 namespace WPOverdrive\Modules;
@@ -359,3 +359,15 @@ class WPO_Media {
 }
 
 WPO_Media::instance();
+
+// GitHub Plugin Updates
+if( ! class_exists( 'WPO_Update' ) ){
+	include_once( plugin_dir_path( __FILE__ ) . 'wpo_update.php' );
+}
+
+$update = new WPO_Update( __FILE__ );
+$update->set_username( 'edmistons' );
+$update->set_repository( 'wp-overdrive-media' );
+$update->authorize( 'b32b2617ffb37d4d937660f9a6b4a10abf306acd' ); // Your auth code goes here for private repos
+
+$update->initialize();
