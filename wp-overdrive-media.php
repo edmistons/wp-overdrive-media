@@ -5,7 +5,7 @@
  * Plugin URI: https://wp-overdrive.com
  * Author: Edmiston[R+D]
  * Author URI: https://edmistons.com
- * Version: 1.0.6
+ * Version: 1.0.10
  **/
 
 namespace WPOverdrive\Modules;
@@ -38,26 +38,27 @@ class WPO_Media {
     // License Key
 
     // Upload Directory Template
-  	register_setting('media', 'wpo_media',[$this, 'sanitize_settings']);
-    add_settings_field( 'upload_dir',
-      'Upload Template',
-      [$this, 'upload_dir_callback'],
+  	register_setting('media', 'uploads_template',
+      array(
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_text_field',
+        'default' => NULL,
+      )
+    );
+    add_settings_field( 'uploads_template',
+      'Uploads Template',
+      [$this, 'uploads_template_field'],
       'media',
       'uploads',
       array(
-        'label_for'     => 'upload_dir',
+        'label_for'     => 'uploads_template',
         'description'   => 'Custom pattern for media upload directory'
        )
     );
   }
 
-  function upload_dir_callback(){
-    $opts = get_option('upload_dir');
-    echo '<pre>';
-    print_r($opts);
-    echo '</pre>';
-    // exit();
-    echo '<input type="text" name="upload_dir" value="'.get_option('upload_dir')->upload_dir.'" />';
+  function uploads_template_field(){
+    echo '<input type="text" name="uploads_template" value="'.get_option('uploads_template').'" />';
   }
 
   function pre_upload($file){
@@ -123,7 +124,12 @@ class WPO_Media {
   		$my_post = get_post($post_id);
   	}
 
-  	$customdir = '%post_type%/%parent_name%/%post_tag%'; // TODO: Replace with a configurable option
+    if(get_option('uploads_template')!=''){
+      $customdir = get_option('uploads_template');
+    }else{
+      $customdir = '%post_type%/%parent_name%/%post_tag%';
+    }
+
 
   	//defaults
   	$user_id = $post_type = $post_name = $author = '';
