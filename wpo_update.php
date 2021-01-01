@@ -18,6 +18,21 @@ class WPO_Update {
 			return $this;
 	}
 
+	public function initialize() {
+			$this->get_repository_info();
+			add_filter('pre_set_site_transient_update_plugins', [$this, 'modify_transient'], 10, 1);
+			add_filter('plugins_api', [$this, 'plugin_popup'], 20, 3);
+			add_filter('upgrader_post_install', [$this, 'after_install'], 10, 3);
+
+			add_filter('all_plugins', function ($plugins) {
+				if ( isset($plugins[$this->basename]) ) {
+					$plugins[$this->basename]['slug'] = $this->basename;
+				}
+				return $plugins;
+			});
+	}
+
+
 	public function set_plugin_properties() {
 			$this->plugin = get_plugin_data($this->file);
 			$this->basename = plugin_basename($this->file);
@@ -80,13 +95,6 @@ class WPO_Update {
 			}
 	}
 
-	public function initialize() {
-			$this->get_repository_info();
-			add_filter('pre_set_site_transient_update_plugins', [$this, 'modify_transient'], 10, 1);
-			add_filter('plugins_api', [$this, 'plugin_popup'], 10, 3);
-			add_filter('upgrader_post_install', [$this, 'after_install'], 10, 3);
-	}
-
 	public function modify_transient($transient) {
 			if (property_exists($transient, 'checked')) {
 					if ($checked = $transient->checked) {
@@ -118,8 +126,13 @@ class WPO_Update {
 					return false;
 			}
 
+			// do nothing if it is not our plugin
+			if( $args->slug !== $this->basename ) {
+				return false;
+			}
+
 			if (!empty($args->slug)) {
-					if ($args->slug == current(explode('/' , $this->basename))) {
+					if ($args->slug == $this->basename) { //current(explode('/' , $this->basename))) {
 							$this->get_repository_info();
 
 							$plugin = [
@@ -127,18 +140,39 @@ class WPO_Update {
 									'slug' => $this->basename,
 									'tested' => '5.6',
 									'version' => $this->github_response['tag_name'],
-									'author' => $this->plugin['AuthorName'],
+									'author' => '<a href="'.$this->plugin['AuthorURI'].'" target="_blank">'.$this->plugin['AuthorName'].'</a>',
 									'author_profile' => $this->plugin['AuthorURI'],
 									'last_updated' => $this->github_response['published_at'],
 									'homepage' => $this->plugin['PluginURI'],
 									'short_description' => $this->plugin['Description'],
-									'sections' => [
-											'Description' => $this->plugin['Description'],
-											'Updates' => $this->github_response['body'],
-									],
 									'download_link' => $this->github_response['zipball_url']
 							];
 
+							// TODO: Look in assets folder for screenshots and parse image data
+							// $plugin['sections']['Screenshots'] =  '<ol><li><a href="IMG_URL" target="_blank"><img src="IMG_URL" alt="CAPTION" /></a><p>CAPTION</p></li></ol>';
+
+							$plugin['sections']['Overview'] = 'Overview';
+
+							if ($this->github_response['body']!=''){
+								$plugin['sections']['Updates'] = $this->github_response['body'];
+							}
+
+							$plugin['sections']['FAQ'] = 'FAQ';
+
+							$plugin['sections']['Changelog'] = 'Changelog';
+
+							// // Debug
+							// $ghr = var_export($this->github_response,true);
+							// $plugin['sections']['GitHub'] = '<pre>'.$ghr.'</pre>';
+
+							// foreach($this->github_response['author'] as $author){
+							// 	$plugin['contributors'][]=[$author->login => $author['html_url']];
+							// }
+
+							$plugin['banners'] = array(
+								'low' => plugin_dir_url( __FILE__ ).'/assets/banner.png',
+								'high' => plugin_dir_url( __FILE__ ).'/assets/banner.png'
+							);
 							return (object) $plugin;
 					}
 			}
