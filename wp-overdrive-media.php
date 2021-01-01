@@ -5,7 +5,7 @@
  * Plugin URI: https://wp-overdrive.com
  * Author: Edmiston[R+D]
  * Author URI: https://edmistons.com
- * Version: 1.0.11
+ * Version: 1.0.12
  **/
 
 namespace WPOverdrive\Modules;
