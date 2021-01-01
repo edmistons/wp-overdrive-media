@@ -58,7 +58,7 @@ class WPO_Media {
   }
 
   function uploads_template_field(){
-    echo '<input type="text" name="uploads_template" value="'.get_option('uploads_template').'" />';
+    echo '<input type="text" name="uploads_template" class="regular-text" value="'.get_option('uploads_template').'" />';
   }
 
   function pre_upload($file){
