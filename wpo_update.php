@@ -22,7 +22,7 @@ class WPO_Update {
 	public function initialize() {
 			$this->get_repository_info();
 			add_filter('pre_set_site_transient_update_plugins', [$this, 'modify_transient'], 10, 1);
-			add_filter('plugins_api', [$this, 'plugin_popup'], 20, 3);
+			add_filter('plugins_api', [$this, 'plugin_popup'], 10, 3);
 			add_filter('upgrader_post_install', [$this, 'after_install'], 10, 3);
 
 			add_filter('all_plugins', function ($plugins) {
@@ -165,12 +165,12 @@ class WPO_Update {
 			}
 
 			// do nothing if it is not our plugin
-			if( $args->slug !== $this->basename ) {
+			if( $args->slug !== $this->basename && $args->slug != current( explode( '/' , $this->basename ) ) ) {
 				return false;
 			}
 
 			if (!empty($args->slug)) {
-					if ($args->slug == $this->basename) { //current(explode('/' , $this->basename))) {
+					if ($args->slug == $this->basename || $args->slug == current( explode( '/' , $this->basename ) ) ) { //current(explode('/' , $this->basename))) {
 							$this->get_repository_info();
 
 							$plugin = [
