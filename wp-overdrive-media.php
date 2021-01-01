@@ -5,7 +5,7 @@
  * Plugin URI: https://wp-overdrive.com
  * Author: Edmiston[R+D]
  * Author URI: https://edmistons.com
- * Version: 1.0.13
+ * Version: 1.0.15
  **/
 
 namespace WPOverdrive\Modules;
@@ -49,16 +49,24 @@ class WPO_Media {
       'Uploads Template',
       [$this, 'uploads_template_field'],
       'media',
-      'uploads',
-      array(
-        'label_for'     => 'uploads_template',
-        'description'   => 'Custom pattern for media upload directory'
-       )
+      'uploads'
     );
   }
 
   function uploads_template_field(){
-    echo '<input type="text" name="uploads_template" class="regular-text" value="'.get_option('uploads_template').'" />';
+    $uploads = wp_get_upload_dir();
+    $value = (get_option('uploads_template')!='')?get_option('uploads_template'):'%post_type%/%parent_name%/%post_tag%';
+    echo '<code>'.$uploads['baseurl'].'/</code><input type="text" name="uploads_template" class="regular-text" value="'.$value.'" />';
+    echo '<p>Organize uploads into folders based on this pattern. This allows for easier management by FTP.<br/><strong>Default will save media in a folder corresponding to type and name.</strong></p><br/>';
+    echo '<div class="available-structure-tags">';
+    echo '<p>Available tags:';
+    echo '<button class="button button-secondary" type="button">%post_type%</button>';
+    echo '<button class="button button-secondary" type="button">%parent_name%</button>';
+    echo '<button class="button button-secondary" type="button">%category%</button>';
+    echo '<button class="button button-secondary" type="button">%post_tag%</button>';
+    echo '</p>';
+    echo '</div>';
+    echo '<style>.available-structure-tags button {display: inline-block; margin-left: 5px!important;}</style>';
   }
 
   function pre_upload($file){
