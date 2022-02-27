@@ -96,7 +96,7 @@ class WPO_Update {
 			}
 
 			// contributors
-			if (is_null($this->$github_contributors)) {
+			if (is_null($this->github_contributors)) {
 					$request_uri = sprintf('https://api.github.com/repos/%s/%s/contributors', $this->username, $this->repository);
 
 					// Switch to HTTP Basic Authentication for GitHub API v3
@@ -129,7 +129,7 @@ class WPO_Update {
 					curl_close($curl);
 
 					$response = json_decode($response, true);
-					$this->$github_contributors = $response;
+					$this->github_contributors = $response;
 			}
 	}
 
